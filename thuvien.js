@@ -67,3 +67,39 @@ searchInput.addEventListener('input', function () {
         });
     });
 });
+// Hàm chuyển tiếng Việt có dấu sang không dấu
+function removeVietnameseTones(str) {
+  return str
+      .normalize('NFD')                      // Tách dấu khỏi chữ
+      .replace(/[\u0300-\u036f]/g, '')       // Loại bỏ các dấu
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D') // Chuyển đ -> d
+      .toLowerCase();
+}
+
+document.querySelector('.timkiem').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const input = document.getElementById('search').value.trim();
+  const keyword = removeVietnameseTones(input);
+
+  const allSongs = document.querySelectorAll('.block-element');
+
+  let matchCount = 0;
+
+  allSongs.forEach(song => {
+      const artist = song.querySelector('.artist')?.textContent || '';
+      const title = song.querySelector('.song-info, p')?.textContent || '';
+      const combined = `${artist} ${title}`;
+      const normalized = removeVietnameseTones(combined);
+
+      if (normalized.includes(keyword)) {
+          song.style.display = 'block';
+          matchCount++;
+      } else {
+          song.style.display = 'none';
+      }
+  });
+
+  if (matchCount === 0) {
+      alert("Không tìm thấy bài hát hoặc nghệ sĩ.");
+  }
+});
